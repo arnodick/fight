@@ -8,7 +8,7 @@ void options();
 void statusincrement();
 void result();
 int attackroll(int atkbonus, int defbonus);
-int damagecalc (int status, int power, int atkbonus, int defbonus);
+int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus);
 void statusreset();
 void endgame();
 
@@ -21,6 +21,7 @@ int basicskillroll (int numofdice);
 
 void movenameset();
 void damagenameset();
+void namefix();
 
 
 int resultmatrix[5][5] = { 1, 1, 3, 2, 5,
@@ -151,24 +152,22 @@ void result ()
        if (statsplayer1[1] - player1[3] > statsplayer2[1] - player2[3])
        {
             cout << "Player 1 was faster than player 2!";
-            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
             if (timercheck == 1)
                 player2[2] = 0; //Timer reset, because a new status has been inflicted.
             
-            if (player2[1] > 7)
-                player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+            namefix();
              
             cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
             
             if (player2[1] < 1)
             {
                 cout << "\nPlayer 2 fought through the pain!\n";
-                player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+                player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
                 if (timercheck == 1)
                     player1[2] = 0; //Timer reset, because a new status has been inflicted.
                 
-                if (player1[1] > 7)
-                    player1[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+                namefix();
              
                 cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
             }
@@ -181,24 +180,22 @@ void result ()
        else
        {
             cout << "Player 2 was faster than player 1!";
-            player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+            player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
             if (timercheck == 1)
                 player1[2] = 0; //Timer reset, because a new status has been inflicted.
             
-            if (player1[1] > 7)
-                player1[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+            namefix();
             
             cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
             
             if (player1[1] < 1)
             {
                 cout << "\nPlayer 1 fought through the pain!\n";
-                player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+                player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
                 if (timercheck == 1)
                     player2[2] = 0; //Timer reset, because a new status has been inflicted.
                 
-                if (player2[1] > 7)
-                    player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+                namefix();
              
                 cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
             }
@@ -217,23 +214,21 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
             if (timercheck == 1)
                 player2[2] = 0; //Timer reset, because a new status has been inflicted.
               
-            if (player2[1] > 7)
-                player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+            namefix();
               
             cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-           player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+           player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
            if (timercheck == 1)
                 player1[2] = 0; //Timer reset, because a new status has been inflicted.
                
-           if (player1[1] > 7)
-                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+           namefix();
                
            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -251,23 +246,21 @@ void result ()
            
        if (player1[0] == 3 || player1[0] ==  4)
        {
-           player2[1] = damagecalc (player2[1], player2[3], atkbonus, defbonus);
+           player2[1] = damagecalc (player2[1], player2[3], 0, 0, atkbonus, defbonus);
            if (timercheck == 1)
                 player2[2] = 0; //Timer reset, because a new status has been inflicted.
            
-           if (player2[1] > 7)
-                player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+           namefix();
            
            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-           player1[1] = damagecalc (player1[1], player1[3], atkbonus, defbonus);
+           player1[1] = damagecalc (player1[1], player1[3], 0, 0, atkbonus, defbonus);
            if (timercheck == 1)
                 player1[2] = 0; //Timer reset, because a new status has been inflicted.
            
-           if (player1[1] > 7)
-                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+           namefix();
            
            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -288,23 +281,20 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
             if (timercheck == 1)
                 player2[2] = 0; //Timer reset, because a new status has been inflicted.
             
-            if (player2[1] > 7)
-                player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
-            
+            namefix();
             cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-            player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+            player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
             if (timercheck == 1)
                 player1[2] = 0; //Timer reset, because a new status has been inflicted.
             
-            if (player1[1] > 7)
-                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+            namefix();
             
             cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -343,10 +333,20 @@ int damagecalc (int status, int power, int str, int res, int atkbonus, int defbo
     }
     else
     {
-        timercheck = 1;
         //cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
-        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " = " << power + result << ")";
-        return power /*- 1*/ + str - res + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
+        if (str > power)
+            str = power;
+        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " = " << power /*- 1*/ + str - res + result << ")";
+        if ( (power + str - res + result) > status)
+        {
+            timercheck = 1;
+            return power /*- 1*/ + str - res + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
+        }
+        else
+        {
+            timercheck = 0;
+            return status;
+        }
     }
 }
 
@@ -548,5 +548,18 @@ void damagenameset()
     damagenames[5]=("KNOCKED DOWN");
     damagenames[6]=("KNOCKED DOWN");
     damagenames[7]=("KNOCKED OUT");
+}
+
+void namefix()
+//Makes any outcome greater than 7 = 7, or lower than 0 = 0, so that game doesn't crash.
+{
+    if (player1[1] < 0)
+        player1[1] = 0;
+    if (player1[1] > 7)
+        player1[1] = 7;
+    if (player2[1] < 0)
+        player2[1] = 0;
+    if (player2[1] > 7)
+        player2[1] = 7;
 }
 
