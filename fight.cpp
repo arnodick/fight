@@ -2,16 +2,21 @@
 #include <ctime>
 #include <iostream>
 #include <vector>
+#include <fstream>
+
 
 using namespace std;
+void report();
 void options();
-void locbonusset();
 void statusincrement();
 void turnresult();
-int attackroll(int atkbonus, int defbonus);
-int damagecalc (int result, int status, int power, int str, int res, int atkbonus, int defbonus, int concbonus);
 void statusreset();
 void endgame();
+
+void locbonusset();
+
+int attackroll(int atkbonus, int defbonus);
+int damagecalc (int result, int status, int power, int str, int res, int atkbonus, int defbonus, int locbonus);
 
 void player1valid();
 void player2valid();
@@ -22,6 +27,7 @@ int basicskillroll (int numofdice);
 
 void movenameset();
 void damagenameset();
+void attribnameset();
 void namefix();
 
 
@@ -49,6 +55,7 @@ int player1[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, player2[9] = {0, 0, 0, 0, 0, 0, 0,
 //   ie: 1 = Head, 2 = Body, 3 = Legs
 
 int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
+int permstatsplayer1[5] = {2, 2, 2, 2, 2}, permstatsplayer2[5] = {2, 2, 2, 2, 2};
 // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
 
 int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
@@ -62,6 +69,7 @@ vector<string> movenames(5);
 vector<string> damagenames(8);
 vector<string> paindamagenames(8);
 vector<string> conddamagenames(8);
+vector<string> attribnames(5);
 
 
 int main()
@@ -70,15 +78,27 @@ int main()
     srand((unsigned)time(NULL));
     movenameset();
     damagenameset();
+    attribnameset();
+    
+    ifstream player1in ("player1.txt");
+    ifstream player2in ("player2.txt");
+    
+    for (int y = 0; y < 5; y++)
+    {
+        player1in>> permstatsplayer1[y];
+        player2in>> permstatsplayer2[y];
+        statsplayer1[y] = permstatsplayer1[y];
+        statsplayer2[y] = permstatsplayer2[y];
+    }
     
     for (int x = 1; x == 1; )
     {
-     
-        //Reset all statuses and counts for a new game.   
+        //Reset all statuses and counts for a new game.
         knockdown1 = 0; knockdown2 = 0; player2[2] = 0; player2[3] = 0;  player1[2] = 0;  player1[3] = 0; player2[4] = 0; player2[5] = 0;  player1[4] = 0;  player1[5] = 0; player2[6] = 0; player2[7] = 0;  player1[6] = 0;  player1[7] = 0;
         
         for ( ; knockdown1 < 3 && knockdown2 < 3 && player1[2] < 7 && player2[2] < 7; )
         {
+            report();
     
             options();
             
@@ -96,6 +116,15 @@ int main()
     cin>> x;
     system("cls");
     }
+}
+
+void report()
+{
+    for (int z = 0; z < 5; z++)
+    {
+        cout<< "Player 1's " << attribnames[z] << ": " << statsplayer1[z] << "     ";
+        cout<< "Player 2's " << attribnames[z] << ": " << statsplayer2[z] << "\n";
+    } 
 }
 
 void options()
@@ -201,11 +230,13 @@ void locbonusset()
 void statusincrement()
 {
     // Now that a turn has passed, and another result hasn't been added in yet, the turn counter for status is incremented.
+    // Conussion status and counter
     if (player1[2] > 0)
        player1[3]++;
     if (player2[2] > 0)
        player2[3]++;
        
+    // Pain status and counter
     if (player1[4] > 0)
        player1[5]++;
     if (player2[4] > 0)
@@ -474,7 +505,7 @@ int attackroll(int atkbonus, int defbonus)
     return outcome1 - outcome2;
 }
 
-int damagecalc (int result, int status, int power, int str, int res, int atkbonus, int defbonus, int concbonus)
+int damagecalc (int result, int status, int power, int str, int res, int atkbonus, int defbonus, int locbonus)
 {
     if (result < 0)
     {
@@ -490,11 +521,11 @@ int damagecalc (int result, int status, int power, int str, int res, int atkbonu
         //cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
         //if (str > power)
         //    str = power;
-        cout << "(Atk Pwr = " << (power-1) << " + Str = " << str << " - Resist = " << res << " + Result = " << result << " + Loc. Bonus = " << concbonus << " = " << (power-1) /*- 1*/ + str - res + result + concbonus<< ")\n";
-        if ( ( (power-1) + str - res + result + concbonus) > status)
+        cout << "(Atk Pwr = " << (power-1) << " + Str = " << str << " - Resist = " << res << " + Result = " << result << " + Loc. Bonus = " << locbonus << " = " << (power-1) /*- 1*/ + str - res + result + locbonus<< ")\n";
+        if ( ( (power-1) + str - res + result + locbonus) > status)
         {
             timercheck = 1;
-            return (power-1) /*- 1*/ + str - res + result + concbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
+            return (power-1) /*- 1*/ + str - res + result + locbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
         }
         else
         {
@@ -575,7 +606,7 @@ void statusreset()
        cout<< "\nPlayer 2 recovered and and his CONCUSSION status is " << damagenames[player2[2]] << "\n";
     }
     
-        // If a player's PAIN 2 status is unchanged after two turns of results, then that status goes away. ie: The player didn't get hurt while STUNNED two turns, so they shook it off.
+    // If a player's PAIN 2 status is unchanged after two turns of results, then that status goes away. ie: The player didn't get hurt while STUNNED two turns, so they shook it off.
     if ( (player1[4] == 3 || player1[4] == 4) && player1[5] > 1)
     {
        player1[4] = 0; //Status reset.
@@ -601,6 +632,13 @@ void statusreset()
        player2[4] = 0; //Status reset.
        player2[5] = 0; //Timer reset.
        cout<< "\nPlayer 2 recovered and his PAIN status is " << paindamagenames[player2[4]] << "\n";
+    }
+    
+    // Lower player's stats according to conditioning status.
+    for (int y = 0; y < 5; y++)
+    {
+        statsplayer1[y] = permstatsplayer1[y] - (player1[6] / 4);
+        statsplayer2[y] = permstatsplayer2[y] - (player2[6] / 4);
     }
     
     // Maybe do this so player goes from STUNNED to DISTRACTED after one turn?
@@ -643,7 +681,7 @@ void player1valid()
 
 void player2valid()
 {
-     if (player2[2] > 0)
+    if (player2[2] > 0)
     {
         for ( ; (player2[0] < 3 || player2[0] > 5); )
         {
@@ -688,7 +726,7 @@ int resultcalc (int tempresult)
     return result;
 }
 
-
+/*
 int basicskillroll (int numofdice)
 // Flips a number of coins and outputs their results, using resultcalc.
 // All results are added together.
@@ -707,9 +745,9 @@ int basicskillroll (int numofdice)
     }
     return finalresult;
 }
+*/
 
 
-/*
 int basicskillroll (int numofdice)
 // Flips a number of coins and outputs their results, using resultcalc.
 // The highest result is taken.
@@ -729,7 +767,7 @@ int basicskillroll (int numofdice)
     }
     return finalresult;
 }
-*/
+
 
 void movenameset()
 // Defines the names of the different moves.
@@ -764,7 +802,7 @@ void damagenameset()
     paindamagenames[6]=("PAIN 3");
     paindamagenames[7]=("PAIN 4");
 
-// Defines the names of the different levels of concussion damage.
+// Defines the names of the different levels of conditioning damage.
 
     conddamagenames[0]=("FINE");
     conddamagenames[1]=("COND 1");
@@ -774,6 +812,16 @@ void damagenameset()
     conddamagenames[5]=("COND 3");
     conddamagenames[6]=("COND 3");
     conddamagenames[7]=("COND 4");
+}
+
+void attribnameset()
+// Defines the names of the different moves.
+{
+    attribnames[0]=("STR");
+    attribnames[1]=("SPD");
+    attribnames[2]=("RES");
+    attribnames[3]=("WILL");
+    attribnames[4]=("COND");
 }
 
 void namefix()
