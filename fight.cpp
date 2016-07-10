@@ -18,6 +18,9 @@ void locbonusset();
 int attackroll(int atkbonus, int defbonus);
 int damagecalc (int result, int status, int power, int str, int res, int atkbonus, int defbonus, int locbonus);
 
+void resultplayer1attack();
+void resultplayer2attack();
+
 void player1valid();
 void player2valid();
 
@@ -63,12 +66,11 @@ int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
 int locbonus1[3] = {0, 0, 0}, locbonus2[3] = {0, 0, 0};
 // First = Concussion, Second = Pain, Third = Conditioning
 
-int result, temp;
+int result = 0, temp = 0, atkbonus = 0, defbonus = 0;
                             
 vector<string> movenames(5);
 vector<string> damagenames(8);
 vector<string> paindamagenames(8);
-vector<string> conddamagenames(17);
 vector<string> attribnames(5);
 
 
@@ -79,6 +81,8 @@ int main()
     movenameset();
     damagenameset();
     attribnameset();
+	
+	cout<< "FIGHT!";
     
     ifstream player1in ("player1.txt");
     ifstream player2in ("player2.txt");
@@ -157,30 +161,32 @@ void options()
         }
     }
 
+	//TODO: this is where AI code should go
     if (player2[2] > 0)
     {
         cout<< "\nPlayer 2 is " << damagenames[player2[2]] << " and may only:\n\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
-        cin>> player2[0];
+		player2[0] = rand() % 5 + 1;
+        //cin>> player2[0];//TODO: make this player2[0] = random integer(x) where x is whatever the options are
         player2valid();
     }
     else
     {
         cout<< "\nPlease choose a move for Player 2:\n\n   1) Punch\n   2) Kick\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
-        cin>> player2[0];
+        cin>> player2[0];//TODO: here too
         player2valid();
         if (player2[0] == 1)
         {
             cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
-            cin>> player2[1];
+            cin>> player2[1];//TODO: here too
             cout<< "\n     Please choose a location for Player 2's " << movenames[player2[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
-            cin>> player2[8];
+            cin>> player2[8];//TODO: here too
         }
         if (player2[0] == 2)
         {
             cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      1) Front Kick\n\n      3) Roundhouse\n\n      5) Spinning Kick\n\n   ";
-            cin>> player2[1];
+            cin>> player2[1];//TODO: here too
             cout<< "\n     Please choose a location for Player 2's " << movenames[player2[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
-            cin>> player2[8];
+            cin>> player2[8];//TODO: here too
         }
     }
     locbonusset();
@@ -246,8 +252,6 @@ void statusincrement()
 void turnresult()
 // Uses both players' moves and their comparison in the matrix to output a result for the turn's moves.
 {
-    int result = 0, atkbonus = 0, defbonus = 0;        
-
     if (resultmatrix[player2[0]-1][player1[0]-1] == 1)
     {
        atkbonus = 3;
@@ -256,41 +260,13 @@ void turnresult()
        if (statsplayer1[2] - player1[1] > statsplayer2[2] - player2[1])
        {
             cout << "Player 1 was faster than player 2!";
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-
-            player2[2] = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
-            if (timercheck == 1)
-                player2[3] = 0; //Timer reset, because a new status has been inflicted.
-            player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
-                player2[5] = 0; //Timer reset, because a new status has been inflicted.
-            player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
             
-            namefix();
-             
-            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and " << conddamagenames[player2[6]] <<"!\n";
+            resultplayer1attack();
             
             if (player2[2] < 1)
             {
                 cout << "\nPlayer 2 fought through the pain!\n";
-                if (defbonus > 0)
-                    result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-                else
-                    result = attackroll(atkbonus, defbonus);
-
-                player1[2] = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
-                if (timercheck == 1)
-                    player1[3] = 0; //Timer reset, because a new status has been inflicted.
-                player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
-                if (timercheck == 1)
-                    player1[5] = 0; //Timer reset, because a new status has been inflicted.
-                player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
-                
-                namefix();
-             
-                cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and " << conddamagenames[player1[6]] <<"!\n";
+                resultplayer2attack();
             }
             
        }
@@ -301,42 +277,12 @@ void turnresult()
        else
        {
             cout << "Player 2 was faster than player 1!";
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-
-            player1[2] = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
-            if (timercheck == 1)
-                player1[3] = 0; //Timer reset, because a new status has been inflicted.
-            player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
-            if (timercheck == 1)
-                player1[5] = 0; //Timer reset, because a new status has been inflicted.
-            player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
-            
-            namefix();
-            
-            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and " << conddamagenames[player1[6]] <<"!\n";
+            resultplayer2attack();
             
             if (player1[2] < 1)
             {
                 cout << "\nPlayer 1 fought through the pain!\n";
-                if (defbonus > 0)
-                    result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-                else
-                    result = attackroll(atkbonus, defbonus);
-
-                player2[2] = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
-                if (timercheck == 1)
-                    player2[3] = 0; //Timer reset, because a new status has been inflicted.
-                player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
-                if (timercheck == 1)
-                    player2[5] = 0; //Timer reset, because a new status has been inflicted.
-                player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
-                
-                namefix();
-             
-                cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and " << conddamagenames[player2[6]] <<"!\n";
+                resultplayer1attack();
             }
        }
     }
@@ -353,41 +299,11 @@ void turnresult()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-
-            player2[2] = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
-            if (timercheck == 1)
-                player2[3] = 0; //Timer reset, because a new status has been inflicted.
-            player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
-            if (timercheck == 1)
-                player2[5] = 0; //Timer reset, because a new status has been inflicted.
-            player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
-              
-            namefix();
-              
-            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and " << conddamagenames[player2[6]] <<"!\n";
+            resultplayer1attack();
        }
        else
        {
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-            
-            player1[2] = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
-            if (timercheck == 1)
-                player1[3] = 0; //Timer reset, because a new status has been inflicted.
-            player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
-            if (timercheck == 1)
-                player1[5] = 0; //Timer reset, because a new status has been inflicted.
-            player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
-               
-            namefix();
-               
-            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and " << conddamagenames[player1[6]] <<"!\n";
+            resultplayer2attack();
        }
     }
        
@@ -416,7 +332,7 @@ void turnresult()
             
             namefix();
            
-            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and " << conddamagenames[player2[6]] <<"!\n";
+            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and COND " << player2[6] <<"!\n";
        }
        else
        {
@@ -433,7 +349,7 @@ void turnresult()
             
             namefix();
             
-            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and " << conddamagenames[player1[6]] <<"!\n";
+            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and COND " << player1[6] <<"!\n";
        }
     }
        
@@ -452,54 +368,67 @@ void turnresult()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-
-            // Concussion damage
-            temp = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
-            if (temp > player2[2])
-            {
-                player2[2] = temp;
-                if (timercheck == 1)
-                    player2[3] = 0; //Timer reset, because a new status has been inflicted.
-            }
-            // Pain damage
-            player2[4] = player2[4] + damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
-            if (timercheck == 1)
-                player2[5] = 0; //Timer reset, because a new status has been inflicted.
-            // Conditioning damage
-            player2[6] = player2[6] + damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
-            
-            namefix();
-            
-            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and " << conddamagenames[player2[6]] <<"!\n";
+            resultplayer1attack();
        }
        else
        {
-            if (defbonus > 0)
-                result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-            else
-                result = attackroll(atkbonus, defbonus);
-
-            temp = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
-            if (temp > player1[2])
-            {
-                player1[2] = temp;
-                if (timercheck == 1)
-                    player1[3] = 0; //Timer reset, because a new status has been inflicted.
-            }
-            player1[4] = player1[4] + damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
-            if (timercheck == 1)
-                player1[5] = 0; //Timer reset, because a new status has been inflicted.
-            player1[6] = player1[6] + damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
-            
-            namefix();
-            
-            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and " << conddamagenames[player1[6]] <<"!\n";
+            resultplayer2attack();
        }
    }
+}
+
+void resultplayer1attack()
+{
+    if (defbonus > 0)
+        result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
+    else
+        result = attackroll(atkbonus, defbonus);
+    
+    // Concussion damage
+    temp = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
+    if (temp > player2[2])
+    {
+        player2[2] = temp;
+        if (timercheck == 1)
+            player2[3] = 0; //Timer reset, because a new status has been inflicted.
+    }
+    // Pain damage
+    player2[4] = player2[4] + damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+    if (timercheck == 1)
+        player2[5] = 0; //Timer reset, because a new status has been inflicted.
+    // Conditioning damage
+    player2[6] = player2[6] + damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
+    
+    namefix();
+    
+    cout<< "\nPlayer 2 is " << damagenames[player2[2]] << ", " << paindamagenames[player2[4]] << " and COND " << player2[6] <<"!\n";
+}
+
+void resultplayer2attack()
+{
+    if (defbonus > 0)
+        result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
+    else
+        result = attackroll(atkbonus, defbonus);
+    
+    // Concussion damage
+    temp = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
+    if (temp > player1[2])
+    {
+        player1[2] = temp;
+        if (timercheck == 1)
+            player1[3] = 0; //Timer reset, because a new status has been inflicted.
+    }
+    // Pain damage
+    player1[4] = player1[4] + damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+    if (timercheck == 1)
+        player1[5] = 0; //Timer reset, because a new status has been inflicted.
+    // Conditioning damage
+    player1[6] = player1[6] + damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
+    
+    namefix();
+    
+    cout<< "\nPlayer 1 is " << damagenames[player1[2]] << ", " << paindamagenames[player1[4]] << " and COND " << player1[6] <<"!\n";
 }
 
 int attackroll(int atkbonus, int defbonus)
@@ -812,26 +741,6 @@ void damagenameset()
     paindamagenames[5]=("PAIN 3");
     paindamagenames[6]=("PAIN 3");
     paindamagenames[7]=("PAIN 4");
-
-// Defines the names of the different levels of conditioning damage.
-
-    conddamagenames[0]=("FINE");
-    conddamagenames[1]=("COND 0");
-    conddamagenames[2]=("COND 0");
-    conddamagenames[3]=("COND 0");
-    conddamagenames[4]=("COND 1");
-    conddamagenames[5]=("COND 1");
-    conddamagenames[6]=("COND 1");
-    conddamagenames[7]=("COND 1");
-    conddamagenames[8]=("COND 2");
-    conddamagenames[9]=("COND 2");
-    conddamagenames[10]=("COND 2");
-    conddamagenames[11]=("COND 2");
-    conddamagenames[12]=("COND 3");
-    conddamagenames[13]=("COND 3");
-    conddamagenames[14]=("COND 3");
-    conddamagenames[15]=("COND 3");
-    conddamagenames[16]=("COND 4");
 }
 
 void attribnameset()
@@ -864,14 +773,5 @@ void namefix()
         player2[4] = 0;
     if (player2[4] > 7)
         player2[4] = 7;
-
-    if (player1[6] < 0)
-        player1[6] = 0;
-    if (player1[6] > 16)
-        player1[6] = 16;
-    if (player2[6] < 0)
-        player2[6] = 0;
-    if (player2[6] > 16)
-        player2[6] = 16;
 }
 
