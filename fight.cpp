@@ -5,10 +5,11 @@
 
 using namespace std;
 void options();
+void locbonusset();
 void statusincrement();
 void result();
 int attackroll(int atkbonus, int defbonus);
-int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus);
+int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus, int concbonus, int painbonus, int condbonus);
 void statusreset();
 void endgame();
 
@@ -51,6 +52,8 @@ int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
 // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
 
 int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
+
+int locbonus1[3] = {0, 0, 0}, locbonus2[3] = {0, 0, 0};
                             
 vector<string> movenames(5);
 vector<string> damagenames(8);
@@ -109,7 +112,7 @@ void options()
             cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
             cin>> player1[1];
             cout<< "\n     Please choose a location for Player 1's " << movenames[player1[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
-            cin>> player1[8];
+            cin>> player1[8];            
         }
         if (player1[0] == 2)
         {
@@ -146,6 +149,48 @@ void options()
             cin>> player2[8];
         }
     }
+    locbonusset();
+}
+
+void locbonusset()
+{
+    if (player1[8] == 1)
+    {
+        locbonus1[0] = 0;
+        locbonus1[1] = -2;
+        locbonus1[2] = -4;
+    }
+    if (player1[8] == 2)
+    {
+        locbonus1[0] = -2;
+        locbonus1[1] = -4;
+        locbonus1[2] = 0;
+    }
+    if (player1[8] == 3)
+    {
+        locbonus1[0] = -4;
+        locbonus1[1] = 0;
+        locbonus1[2] = -2;
+    }
+    
+    if (player2[8] == 1)
+    {
+        locbonus2[0] = 0;
+        locbonus2[1] = -2;
+        locbonus2[2] = -4;
+    }
+    if (player2[8] == 2)
+    {
+        locbonus2[0] = -2;
+        locbonus2[1] = -4;
+        locbonus2[2] = 0;
+    }
+    if (player2[8] == 3)
+    {
+        locbonus2[0] = -4;
+        locbonus2[1] = 0;
+        locbonus2[2] = -2;
+    }
 }
 
 void statusincrement()
@@ -164,13 +209,13 @@ void result ()
 
     if (resultmatrix[player2[0]-1][player1[0]-1] == 1)
     {
-       atkbonus = 0;
-       defbonus = -2; // The person being hit has a -3 to defense, because they are attacking.
+       atkbonus = 3;
+       defbonus = 0; // The person being hit has a -3 to defense, because they are attacking.
        // Compares speed of each player's attack, by checking the speed stat minus the power of the attack. The more powerful an attack, the slower.
        if (statsplayer1[2] - player1[1] > statsplayer2[2] - player2[1])
        {
             cout << "Player 1 was faster than player 2!";
-            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[0], locbonus1[1], locbonus1[2]);
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
             
@@ -181,7 +226,7 @@ void result ()
             if (player2[2] < 1)
             {
                 cout << "\nPlayer 2 fought through the pain!\n";
-                player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
+                player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[0], locbonus2[1], locbonus2[2]);
                 if (timercheck == 1)
                     player1[3] = 0; //Timer reset, because a new status has been inflicted.
                 
@@ -198,7 +243,7 @@ void result ()
        else
        {
             cout << "Player 2 was faster than player 1!";
-            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
+            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[0], locbonus2[1], locbonus2[2]);
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
             
@@ -209,7 +254,7 @@ void result ()
             if (player1[2] < 1)
             {
                 cout << "\nPlayer 1 fought through the pain!\n";
-                player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
+                player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[0], locbonus1[1], locbonus1[2]);
                 if (timercheck == 1)
                     player2[3] = 0; //Timer reset, because a new status has been inflicted.
                 
@@ -223,7 +268,7 @@ void result ()
     if (resultmatrix[player2[0]-1][player1[0]-1] == 2)
     // The attacker made a good choice!
     {
-       atkbonus = 2;
+       atkbonus = 3;
        defbonus = 0;
        if (player1[0] == 1 || player1[0] ==  2)
             cout<< "\nPlayer 1 " << movenames[player1[0]-1] <<"ED through Player 2's " << movenames[player2[0]-1] << "!\n";
@@ -232,7 +277,7 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[0], locbonus1[1], locbonus1[2]);
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
               
@@ -242,7 +287,7 @@ void result ()
        }
        else
        {
-           player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
+           player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[0], locbonus2[1], locbonus2[2]);
            if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
                
@@ -256,7 +301,7 @@ void result ()
     // The defender made a good choice!
     {
        atkbonus = 0;
-       defbonus = 2;
+       defbonus = 3;
        if (player1[0] == 3 || player1[0] ==  4)
            cout<< "\nPlayer 1 " << movenames[player1[0]-1] <<"ED Player 2's " << movenames[player2[0]-1] << "!\n";
        else
@@ -264,7 +309,7 @@ void result ()
            
        if (player1[0] == 3 || player1[0] ==  4)
        {
-           player2[2] = damagecalc (player2[2], player2[1], 0, 0, atkbonus, defbonus);
+           player2[2] = damagecalc (player2[2], player2[1], 0, 0, atkbonus, defbonus, 0, 0, 0);
            if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
            
@@ -274,7 +319,7 @@ void result ()
        }
        else
        {
-           player1[2] = damagecalc (player1[2], player1[1], 0, 0, atkbonus, defbonus);
+           player1[2] = damagecalc (player1[2], player1[1], 0, 0, atkbonus, defbonus, 0, 0, 0);
            if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
            
@@ -299,7 +344,7 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[0], locbonus1[1], locbonus1[2]);
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
             
@@ -308,7 +353,7 @@ void result ()
        }
        else
        {
-            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
+            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[0], locbonus2[1], locbonus2[2]);
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
             
@@ -333,7 +378,7 @@ int attackroll(int atkbonus, int defbonus)
     return outcome1 - outcome2;
 }
 
-int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus)
+int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus, int concbonus, int painbonus, int condbonus)
 {
     int result;
     if (defbonus > 0)
@@ -354,11 +399,11 @@ int damagecalc (int status, int power, int str, int res, int atkbonus, int defbo
         //cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
         if (str > power)
             str = power;
-        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " = " << power /*- 1*/ + str - res + result << ")";
-        if ( (power + str - res + result) > status)
+        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " + Conc. Bonus = " << concbonus << " = " << power /*- 1*/ + str - res + result + concbonus<< ")";
+        if ( (power + str - res + result + concbonus) > status)
         {
             timercheck = 1;
-            return power /*- 1*/ + str - res + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
+            return power /*- 1*/ + str - res + result + concbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
         }
         else
         {
