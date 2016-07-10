@@ -174,6 +174,10 @@ void result ()
             }
             
        }
+       else if (statsplayer1[1] - player1[3] == statsplayer2[1] - player2[3])
+       {
+            cout << "/nBoth players were the same speed, and cancelled each other out!"; 
+       }
        else
        {
             cout << "Player 2 was faster than player 1!";
@@ -321,7 +325,7 @@ int attackroll(int atkbonus, int defbonus)
     return outcome1 - outcome2;
 }
 
-int damagecalc (int status, int power, int atkbonus, int defbonus)
+int damagecalc (int status, int power, int str, int res, int atkbonus, int defbonus)
 {
     int result;
     if (defbonus > 0)
@@ -340,8 +344,9 @@ int damagecalc (int status, int power, int atkbonus, int defbonus)
     else
     {
         timercheck = 1;
-        cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
-        return status + power /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
+        //cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
+        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " = " << power + result << ")";
+        return power /*- 1*/ + str - res + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
     }
 }
 
@@ -479,8 +484,10 @@ int resultcalc (int tempresult)
     return result;
 }
 
+
 int basicskillroll (int numofdice)
-// Flips a number of coins and outputs their results, using resultcalc
+// Flips a number of coins and outputs their results, using resultcalc.
+// All results are added together.
 // (each 1 equals a +1).
 {
     int tempresult = 0, result = 0, finalresult = 0, bonus = 0;
@@ -496,6 +503,29 @@ int basicskillroll (int numofdice)
     }
     return finalresult;
 }
+
+
+/*
+int basicskillroll (int numofdice)
+// Flips a number of coins and outputs their results, using resultcalc.
+// The highest result is taken.
+// (each 1 equals a +1).
+{
+    int tempresult = 0, result = 0, finalresult = 0, bonus = 0;
+    
+    for (int count = 1; count <= numofdice; count++)
+    {
+        tempresult = 0;
+        tempresult = d2();
+        cout<< "\nRoll " << count << " = " << tempresult;
+        result = resultcalc(tempresult);
+        cout<< "\nResult " << count << " = " << result << "\n";
+        if (result > finalresult)
+            finalresult = result;
+    }
+    return finalresult;
+}
+*/
 
 void movenameset()
 // Defines the names of the different moves.
