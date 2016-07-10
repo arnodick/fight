@@ -75,7 +75,7 @@ int main()
     {
      
         //Reset all statuses and counts for a new game.   
-        knockdown1 = 0; knockdown2 = 0; player2[2] = 0; player2[3] = 0;  player1[2] = 0;  player1[3] = 0;
+        knockdown1 = 0; knockdown2 = 0; player2[2] = 0; player2[3] = 0;  player1[2] = 0;  player1[3] = 0; player2[4] = 0; player2[5] = 0;  player1[4] = 0;  player1[5] = 0; player2[6] = 0; player2[7] = 0;  player1[6] = 0;  player1[7] = 0;
         
         for ( ; knockdown1 < 3 && knockdown2 < 3 && player1[2] < 7 && player2[2] < 7; )
         {
@@ -205,6 +205,11 @@ void statusincrement()
        player1[3]++;
     if (player2[2] > 0)
        player2[3]++;
+       
+    if (player1[4] > 0)
+       player1[5]++;
+    if (player2[4] > 0)
+       player2[5]++;
 }
 
 void turnresult()
@@ -227,9 +232,10 @@ void turnresult()
 
             player2[2] = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
             if (timercheck == 1)
-            player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
-            player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
+            player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+                player2[5] = 0; //Timer reset, because a new status has been inflicted.
+            player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
             
             namefix();
              
@@ -247,6 +253,8 @@ void turnresult()
                 if (timercheck == 1)
                     player1[3] = 0; //Timer reset, because a new status has been inflicted.
                 player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+                if (timercheck == 1)
+                    player1[5] = 0; //Timer reset, because a new status has been inflicted.
                 player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
                 
                 namefix();
@@ -271,6 +279,8 @@ void turnresult()
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
             player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+            if (timercheck == 1)
+                player1[5] = 0; //Timer reset, because a new status has been inflicted.
             player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
             
             namefix();
@@ -289,6 +299,8 @@ void turnresult()
                 if (timercheck == 1)
                     player2[3] = 0; //Timer reset, because a new status has been inflicted.
                 player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+                if (timercheck == 1)
+                    player2[5] = 0; //Timer reset, because a new status has been inflicted.
                 player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
                 
                 namefix();
@@ -319,6 +331,8 @@ void turnresult()
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
             player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+            if (timercheck == 1)
+                player2[5] = 0; //Timer reset, because a new status has been inflicted.
             player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
               
             namefix();
@@ -336,6 +350,8 @@ void turnresult()
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
             player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+            if (timercheck == 1)
+                player1[5] = 0; //Timer reset, because a new status has been inflicted.
             player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
                
             namefix();
@@ -361,10 +377,10 @@ void turnresult()
             else
                 result = attackroll(atkbonus, defbonus);
 
-            //player2[2] = damagecalc (result, player2[2], player2[1], 0, 0, atkbonus, defbonus, 0);
+            player2[2] = damagecalc (result, player2[2], player2[1], 0, 0, atkbonus, defbonus, 0);
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
-            player2[4] = damagecalc (result, player2[4], player2[1], 0, 0, atkbonus, defbonus, 0);
+            //player2[4] = damagecalc (result, player2[4], player2[1], 0, 0, atkbonus, defbonus, 0);
             //player2[6] = damagecalc (result, player2[6], player2[1], 0, 0, atkbonus, defbonus, 0);
             
             namefix();
@@ -378,10 +394,10 @@ void turnresult()
             else
                 result = attackroll(atkbonus, defbonus);
 
-            //player1[2] = damagecalc (result, player1[2], player1[1], 0, 0, atkbonus, defbonus, 0);
+            player1[2] = damagecalc (result, player1[2], player1[1], 0, 0, atkbonus, defbonus, 0);
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
-            player1[4] = damagecalc (result, player1[4], player1[1], 0, 0, atkbonus, defbonus, 0);
+            //player1[4] = damagecalc (result, player1[4], player1[1], 0, 0, atkbonus, defbonus, 0);
             //player1[6] = damagecalc (result, player1[6], player1[1], 0, 0, atkbonus, defbonus, 0);
             
             namefix();
@@ -414,6 +430,8 @@ void turnresult()
             if (timercheck == 1)
                 player2[3] = 0; //Timer reset, because a new status has been inflicted.
             player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+            if (timercheck == 1)
+                player2[5] = 0; //Timer reset, because a new status has been inflicted.
             player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
             
             namefix();
@@ -431,6 +449,8 @@ void turnresult()
             if (timercheck == 1)
                 player1[3] = 0; //Timer reset, because a new status has been inflicted.
             player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+            if (timercheck == 1)
+                player1[5] = 0; //Timer reset, because a new status has been inflicted.
             player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
             
             namefix();
@@ -492,6 +512,17 @@ void statusreset()
        player1[3] = 0; //Timer reset.
        player2[2] = 0; //Status reset.
        player2[3] = 0; //Timer reset.
+       
+       player1[4] = 0; //Status reset.
+       player1[5] = 0; //Timer reset.
+       player2[4] = 0; //Status reset.
+       player2[5] = 0; //Timer reset.
+       
+       player1[6] = 0; //Status reset.
+       player1[7] = 0; //Timer reset.
+       player2[6] = 0; //Status reset.
+       player2[7] = 0; //Timer reset.
+       
        knockdown1++;
        cout<< "\nPlayer 1 has been KNOCKED DOWN " << knockdown1 << " times!\n";
     }
@@ -501,6 +532,17 @@ void statusreset()
        player2[3] = 0; //Timer reset.
        player1[2] = 0; //Status reset.
        player1[3] = 0; //Timer reset.
+       
+       player2[4] = 0; //Status reset.
+       player2[5] = 0; //Timer reset.
+       player1[4] = 0; //Status reset.
+       player1[5] = 0; //Timer reset.
+       
+       player2[6] = 0; //Status reset.
+       player2[7] = 0; //Timer reset.
+       player1[6] = 0; //Status reset.
+       player1[7] = 0; //Timer reset.
+       
        knockdown2++;
        cout<< "\nPlayer 2 has been KNOCKED DOWN " << knockdown2 << " times!\n";
     }
@@ -510,13 +552,13 @@ void statusreset()
     {
        player1[2] = 0; //Status reset.
        player1[3] = 0; //Timer reset.
-       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[2]] << "\n";
+       cout<< "\nPlayer 1 recovered and his CONCUSSION status is " << damagenames[player1[2]] << "\n";
     }
     if ( (player2[2] == 3 || player2[2] == 4) && player2[3] > 1)
     {
        player2[2] = 0; //Status reset.
        player2[3] = 0; //Timer reset.
-       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[2]] << "\n";
+       cout<< "\nPlayer 2 recovered and his CONCUSSION status is " << damagenames[player2[2]] << "\n";
     }
     
     // If a player's DISTRACTED status is unchanged after one turn of results, then that status goes away. ie: The player didn't get hurt while DISTRACTED for one turn, so they shook it off.
@@ -524,13 +566,41 @@ void statusreset()
     {
        player1[2] = 0; //Status reset.
        player1[3] = 0; //Timer reset.
-       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[2]] << "\n";
+       cout<< "\nPlayer 1 recovered and and his CONCUSSION status is " << damagenames[player1[2]] << "\n";
     }
     if ( (player2[2] == 1 || player2[2] == 2) && player2[3] > 0)
     {
        player2[2] = 0; //Status reset.
        player2[3] = 0; //Timer reset.
-       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[2]] << "\n";
+       cout<< "\nPlayer 2 recovered and and his CONCUSSION status is " << damagenames[player2[2]] << "\n";
+    }
+    
+        // If a player's PAIN 2 status is unchanged after two turns of results, then that status goes away. ie: The player didn't get hurt while STUNNED two turns, so they shook it off.
+    if ( (player1[4] == 3 || player1[4] == 4) && player1[5] > 1)
+    {
+       player1[4] = 0; //Status reset.
+       player1[5] = 0; //Timer reset.
+       cout<< "\nPlayer 1 recovered and and his PAIN status is " << paindamagenames[player1[4]] << "\n";
+    }
+    if ( (player2[4] == 3 || player2[4] == 4) && player2[5] > 1)
+    {
+       player2[4] = 0; //Status reset.
+       player2[5] = 0; //Timer reset.
+       cout<< "\nPlayer 2 recovered and his PAIN status is " << paindamagenames[player2[4]] << "\n";
+    }
+    
+    // If a player's PAIN 1 status is unchanged after one turn of results, then that status goes away. ie: The player didn't get hurt while DISTRACTED for one turn, so they shook it off.
+    if ( (player1[4] == 1 || player1[4] == 2) && player1[5] > 0)
+    {
+       player1[4] = 0; //Status reset.
+       player1[5] = 0; //Timer reset.
+       cout<< "\nPlayer 1 recovered and his PAIN status is " << paindamagenames[player1[4]] << "\n";
+    }
+    if ( (player2[4] == 1 || player2[4] == 2) && player2[5] > 0)
+    {
+       player2[4] = 0; //Status reset.
+       player2[5] = 0; //Timer reset.
+       cout<< "\nPlayer 2 recovered and his PAIN status is " << paindamagenames[player2[4]] << "\n";
     }
     
     // Maybe do this so player goes from STUNNED to DISTRACTED after one turn?
