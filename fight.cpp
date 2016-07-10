@@ -8,6 +8,7 @@ void options();
 void statusincrement();
 void result();
 int attackroll(int atkbonus, int defbonus);
+int damagecalc (int status, int power, int atkbonus, int defbonus);
 void statusreset();
 void endgame();
 
@@ -38,7 +39,7 @@ int player1[4] = {0, 0, 0, 0}, player2[4] = {0, 0, 0, 0};
 int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
 // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
 
-int knockdown1 = 0, knockdown2 = 0;
+int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
                             
 vector<string> movenames(5);
 vector<string> damagenames(8);
@@ -145,15 +146,14 @@ void result ()
     if (resultmatrix[player2[0]-1][player1[0]-1] == 1)
     {
        atkbonus = 0;
-       defbonus = -2; // The pesron being hit has a -2 to defense, because they are attacking.
+       defbonus = -2; // The person being hit has a -2 to defense, because they are attacking.
        // Compares speed of each player's attack, by checking the speed stat minus the power of the attack. The more powerful an attack, the slower.
        if (statsplayer1[1] - player1[3] > statsplayer2[1] - player2[3])
        {
             cout << "Player 1 was faster than player 2!";
-            result = attackroll(atkbonus, defbonus);
-            cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
-            player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-            player2[2] = 0; //Timer reset, because a new status has been inflicted.
+            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            if (timercheck == 1)
+                player2[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player2[1] > 7)
                 player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
@@ -163,20 +163,23 @@ void result ()
             if (player2[1] < 1)
             {
                 cout << "\nPlayer 2 fought through the pain!\n";
-                result = attackroll(atkbonus, defbonus);
-                cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
-                player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-                player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+                if (timercheck == 1)
+                    player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                
+                if (player1[1] > 7)
+                    player1[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+             
+                cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
             }
             
        }
        else
        {
             cout << "Player 2 was faster than player 1!";
-            result = attackroll(atkbonus, defbonus);
-            cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
-            player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-            player1[2] = 0; //Timer reset, because a new status has been inflicted.
+            player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+            if (timercheck == 1)
+                player1[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player1[1] > 7)
                 player1[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
@@ -186,10 +189,14 @@ void result ()
             if (player1[1] < 1)
             {
                 cout << "\nPlayer 1 fought through the pain!\n";
-                result = attackroll(atkbonus, defbonus);
-                cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
-                player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-                player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+                if (timercheck == 1)
+                    player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                
+                if (player2[1] > 7)
+                    player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+             
+                cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
             }
        }
     }
@@ -203,31 +210,26 @@ void result ()
             cout<< "\nPlayer 1 " << movenames[player1[0]-1] <<"ED through Player 2's " << movenames[player2[0]-1] << "!\n";
        else
             cout<< "\nPlayer 2 " << movenames[player2[0]-1] <<"ED through Player 1's " << movenames[player1[0]-1] << "!\n";
-          
-       result = attackroll(atkbonus, defbonus);
-          
-       if (result < 1)
-            cout<< "\nThe Attacker missed.\n";
             
-       else if (player1[0] == 1 || player1[0] ==  2)
+       if (player1[0] == 1 || player1[0] ==  2)
        {
-            cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
-            player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-            player2[2] = 0; //Timer reset, because a new status has been inflicted.
+            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            if (timercheck == 1)
+                player2[2] = 0; //Timer reset, because a new status has been inflicted.
               
             if (player2[1] > 7)
-             player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
+                player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
               
             cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-           cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
-           player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
-           player1[2] = 0; //Timer reset, because a new status has been inflicted.
+           player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+           if (timercheck == 1)
+                player1[2] = 0; //Timer reset, because a new status has been inflicted.
                
            if (player1[1] > 7)
-              player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
                
            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -243,30 +245,25 @@ void result ()
        else
            cout<< "\nPlayer 2 " << movenames[player2[0]-1] <<"ED Player 1's " << movenames[player1[0]-1] << "!\n";
            
-       result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
-           
-       if (result < 1)
-          cout<< "\nThe Defender failed and was hit.\n";
-           
-       else if (player1[0] == 3 || player1[0] ==  4)
+       if (player1[0] == 3 || player1[0] ==  4)
        {
-           cout << "(Status = " << player2[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player2[1] + player2[3] + result << ")";
-           player2[1] = player2[1] + player2[3] /*- 1*/ + result; //Player 2 was reversed, so her status becomes whatever her status was, plus the power of the move she just did (-1 for balance) plus the result number.
-           player2[2] = 0; //Timer reset, because a new status has been inflicted.
+           player2[1] = damagecalc (player2[1], player2[3], atkbonus, defbonus);
+           if (timercheck == 1)
+                player2[2] = 0; //Timer reset, because a new status has been inflicted.
            
            if (player2[1] > 7)
-             player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+                player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
            
            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-           cout << "(Status = " << player1[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player1[1] + player1[3] + result << ")";
-           player1[1] = player1[1] + player1[3] /*- 1*/ + result; //Player 1 was reversed, so his status becomes whatever his status was, plus the power of the move he just did (-1 for balance) plus the result number.
-           player1[2] = 0; //Timer reset, because a new status has been inflicted.
+           player1[1] = damagecalc (player1[1], player1[3], atkbonus, defbonus);
+           if (timercheck == 1)
+                player1[2] = 0; //Timer reset, because a new status has been inflicted.
            
            if (player1[1] > 7)
-             player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
            
            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -284,31 +281,26 @@ void result ()
             cout<< "\nPlayer 1 " << movenames[player1[0]-1] <<"ED Player 2's " << movenames[player2[0]-1] << "!\n";
        else
             cout<< "\nPlayer 2 " << movenames[player2[0]-1] <<"ED Player 1's " << movenames[player1[0]-1] << "!\n";
-          
-       result = attackroll(atkbonus, defbonus);
-          
-       if (result < 1)
-            cout<< "\nThe Attacker missed.\n";
             
-       else if (player1[0] == 1 || player1[0] ==  2)
+       if (player1[0] == 1 || player1[0] ==  2)
        {
-            cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
-            player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-            player2[2] = 0; //Timer reset, because a new status has been inflicted.
+            player2[1] = damagecalc (player2[1], player1[3], atkbonus, defbonus);
+            if (timercheck == 1)
+                player2[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player2[1] > 7)
-             player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+                player2[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
             
             cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-            cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
-            player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
-            player1[2] = 0; //Timer reset, because a new status has been inflicted.
+            player1[1] = damagecalc (player1[1], player2[3], atkbonus, defbonus);
+            if (timercheck == 1)
+                player1[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player1[1] > 7)
-             player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
+                player1[1] = 7; //Temporary. Makes any outcome greater than 4 = 4, so that game doesn't crash. Must figure out balance for numbers.
             
             cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
        }
@@ -327,6 +319,30 @@ int attackroll(int atkbonus, int defbonus)
     
     cout<< "\nThe net result of " << outcome1 << " - " << outcome2 << " is  " << outcome1 - outcome2 << "\n";
     return outcome1 - outcome2;
+}
+
+int damagecalc (int status, int power, int atkbonus, int defbonus)
+{
+    int result;
+    if (defbonus > 0)
+        result = -attackroll(atkbonus, defbonus); //Flip the result number, because the defender is the focus of the calculatiosn below, and the defender's result is subtracted from the attackers.
+    else
+        result = attackroll(atkbonus, defbonus);
+    if (result < 0)
+    {
+        timercheck = 0;
+        if (defbonus > 0)
+            cout<< "\nThe Defender failed.\n";
+        else
+            cout<< "\nThe Attacker missed.\n";
+        return status;
+    }
+    else
+    {
+        timercheck = 1;
+        cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
+        return status + power /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
+    }
 }
 
 void statusreset()
