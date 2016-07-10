@@ -63,12 +63,12 @@ int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
 int locbonus1[3] = {0, 0, 0}, locbonus2[3] = {0, 0, 0};
 // First = Concussion, Second = Pain, Third = Conditioning
 
-int result;
+int result, temp;
                             
 vector<string> movenames(5);
 vector<string> damagenames(8);
 vector<string> paindamagenames(8);
-vector<string> conddamagenames(8);
+vector<string> conddamagenames(17);
 vector<string> attribnames(5);
 
 
@@ -457,13 +457,20 @@ void turnresult()
             else
                 result = attackroll(atkbonus, defbonus);
 
-            player2[2] = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
-            if (timercheck == 1)
-                player2[3] = 0; //Timer reset, because a new status has been inflicted.
-            player2[4] = damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
+            // Concussion damage
+            temp = damagecalc (result, player2[2], player1[1], statsplayer1[0], statsplayer2[2], atkbonus, defbonus, locbonus1[0]);
+            if (temp > player2[2])
+            {
+                player2[2] = temp;
+                if (timercheck == 1)
+                    player2[3] = 0; //Timer reset, because a new status has been inflicted.
+            }
+            // Pain damage
+            player2[4] = player2[4] + damagecalc (result, player2[4], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus, locbonus1[1]);
             if (timercheck == 1)
                 player2[5] = 0; //Timer reset, because a new status has been inflicted.
-            player2[6] = damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
+            // Conditioning damage
+            player2[6] = player2[6] + damagecalc (result, player2[6], player1[1], statsplayer1[0], statsplayer2[4], atkbonus, defbonus, locbonus1[2]);
             
             namefix();
             
@@ -476,13 +483,17 @@ void turnresult()
             else
                 result = attackroll(atkbonus, defbonus);
 
-            player1[2] = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
-            if (timercheck == 1)
-                player1[3] = 0; //Timer reset, because a new status has been inflicted.
-            player1[4] = damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
+            temp = damagecalc (result, player1[2], player2[1], statsplayer2[0], statsplayer1[2], atkbonus, defbonus, locbonus2[0]);
+            if (temp > player1[2])
+            {
+                player1[2] = temp;
+                if (timercheck == 1)
+                    player1[3] = 0; //Timer reset, because a new status has been inflicted.
+            }
+            player1[4] = player1[4] + damagecalc (result, player1[4], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus, locbonus2[1]);
             if (timercheck == 1)
                 player1[5] = 0; //Timer reset, because a new status has been inflicted.
-            player1[6] = damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
+            player1[6] = player1[6] + damagecalc (result, player1[6], player2[1], statsplayer2[0], statsplayer1[4], atkbonus, defbonus, locbonus2[2]);
             
             namefix();
             
@@ -514,7 +525,7 @@ int damagecalc (int result, int status, int power, int str, int res, int atkbonu
             cout<< "\nThe Defender failed.\n";
         else
             cout<< "\nThe Attacker missed.\n";
-        return status;
+        return 0;
     }
     else
     {
@@ -522,15 +533,15 @@ int damagecalc (int result, int status, int power, int str, int res, int atkbonu
         //if (str > power)
         //    str = power;
         cout << "(Atk Pwr = " << (power-1) << " + Str = " << str << " - Resist = " << res << " + Result = " << result << " + Loc. Bonus = " << locbonus << " = " << (power-1) /*- 1*/ + str - res + result + locbonus<< ")\n";
-        if ( ( (power-1) + str - res + result + locbonus) > status)
+        if ( ( (power-1) + str - res + result + locbonus) > 0)
         {
             timercheck = 1;
-            return (power-1) /*- 1*/ + str - res + result + locbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
+            return (power-1) /*- 1*/ + str - res + result + locbonus;
         }
         else
         {
             timercheck = 0;
-            return status;
+            return 0;
         }
     }
 }
@@ -805,13 +816,22 @@ void damagenameset()
 // Defines the names of the different levels of conditioning damage.
 
     conddamagenames[0]=("FINE");
-    conddamagenames[1]=("COND 1");
-    conddamagenames[2]=("COND 1");
-    conddamagenames[3]=("COND 2");
-    conddamagenames[4]=("COND 2");
-    conddamagenames[5]=("COND 3");
-    conddamagenames[6]=("COND 3");
-    conddamagenames[7]=("COND 4");
+    conddamagenames[1]=("COND 0");
+    conddamagenames[2]=("COND 0");
+    conddamagenames[3]=("COND 0");
+    conddamagenames[4]=("COND 1");
+    conddamagenames[5]=("COND 1");
+    conddamagenames[6]=("COND 1");
+    conddamagenames[7]=("COND 1");
+    conddamagenames[8]=("COND 2");
+    conddamagenames[9]=("COND 2");
+    conddamagenames[10]=("COND 2");
+    conddamagenames[11]=("COND 2");
+    conddamagenames[12]=("COND 3");
+    conddamagenames[13]=("COND 3");
+    conddamagenames[14]=("COND 3");
+    conddamagenames[15]=("COND 3");
+    conddamagenames[16]=("COND 4");
 }
 
 void attribnameset()
@@ -847,11 +867,11 @@ void namefix()
 
     if (player1[6] < 0)
         player1[6] = 0;
-    if (player1[6] > 7)
-        player1[6] = 7;
+    if (player1[6] > 16)
+        player1[6] = 16;
     if (player2[6] < 0)
         player2[6] = 0;
-    if (player2[6] > 7)
-        player2[6] = 7;
+    if (player2[6] > 16)
+        player2[6] = 16;
 }
 
