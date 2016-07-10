@@ -397,13 +397,13 @@ int damagecalc (int status, int power, int str, int res, int atkbonus, int defbo
     else
     {
         //cout << "(Status = " << status << " + Attack Pwr = " << power << " + Result = " << result << " = " << status + power + result << ")";
-        if (str > power)
-            str = power;
-        cout << "(Attack Pwr = " << power << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " + Conc. Bonus = " << concbonus << " = " << power /*- 1*/ + str - res + result + concbonus<< ")";
-        if ( (power + str - res + result + concbonus) > status)
+        //if (str > power)
+        //    str = power;
+        cout << "(Attack Pwr = " << (power-2) << " + Strength = " << str << " - Resistance = " << res << " + Result = " << result << " + Conc. Bonus = " << concbonus << " = " << (power-2) /*- 1*/ + str - res + result + concbonus<< ")";
+        if ( ( (power-2) + str - res + result + concbonus) > status)
         {
             timercheck = 1;
-            return power /*- 1*/ + str - res + result + concbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
+            return (power-2) /*- 1*/ + str - res + result + concbonus; //Player 2 was hit, so her status becomes the power of the strike she was hit with plus whatever her current damage status is, plus the net result of the dice.
         }
         else
         {
