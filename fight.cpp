@@ -31,13 +31,15 @@ int resultmatrix[5][5] = { 1, 1, 3, 2, 5,
                            5, 5, 4, 4, 4 };
 //This will become a 5x5 array, or larger, as more possibilities are added.
 
-int player1[4] = {0, 0, 0, 0}, player2[4] = {0, 0, 0, 0};
+int player1[6] = {0, 0, 0, 0, 0, 0}, player2[6] = {0, 0, 0, 0, 0, 0};
 // The first value of the array is the move, the second value of the array is
-// the status of the player. ie: Pain, Stunned, etc. The third is the timer for 
-// the status. ie: 1 means that status has been applied to the player for 1 full 
+// the concussion status of the player. ie: Stunned, knocked out, etc. The third is the timer for 
+// the concussion status. ie: 1 means that status has been applied to the player for 1 full 
 // turn. The fourth is the power of the move. (0 = jab, 1 = power punch, etc.)
+// Fifth is the pain status of the player. ie: distracted, confused, etc. 
+// Sixth is the timer for the pain status.
 
-int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
+int statsplayer1[5] = {3, 3, 3, 3, 3}, statsplayer2[5] = {3, 3, 3, 3, 3};
 // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
 
 int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
@@ -96,12 +98,12 @@ void options()
         player1valid();
         if (player1[0] == 1)
         {
-            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Hook\n\n   ";
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
             cin>> player1[3];
         }
         if (player1[0] == 2)
         {
-            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      1) Front Kick\n      2) Roundhouse\n      3) Spinning Kick\n\n   ";
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      1) Kick\n\n      3) Roundhouse\n\n      5) Spinning Kick\n\n   ";
             cin>> player1[3];
         }
     }
@@ -119,12 +121,12 @@ void options()
         player2valid();
         if (player2[0] == 1)
         {
-            cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Hook\n\n   ";
+            cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
             cin>> player2[3];
         }
         if (player2[0] == 2)
         {
-            cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      1) Front Kick\n      2) Roundhouse\n      3) Spinning Kick\n\n   ";
+            cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      1) Front Kick\n\n      3) Roundhouse\n\n      5) Spinning Kick\n\n   ";
             cin>> player2[3];
         }
     }
@@ -147,7 +149,7 @@ void result ()
     if (resultmatrix[player2[0]-1][player1[0]-1] == 1)
     {
        atkbonus = 0;
-       defbonus = -2; // The person being hit has a -2 to defense, because they are attacking.
+       defbonus = -2; // The person being hit has a -3 to defense, because they are attacking.
        // Compares speed of each player's attack, by checking the speed stat minus the power of the attack. The more powerful an attack, the slower.
        if (statsplayer1[1] - player1[3] > statsplayer2[1] - player2[3])
        {
@@ -305,11 +307,11 @@ int attackroll(int atkbonus, int defbonus)
 {
     int outcome1 = 0, outcome2 = 0;
     
-    outcome1 = basicskillroll(2+atkbonus); //Attackers rolls 2 dice plus attackbonus, if any. (Will input numbers for skill instead of just 2, later.)
-    cout<< "\nThe highest outcome of " << 2 + atkbonus << " dice for The Attacker is: " << outcome1 << "\n\n\n";
+    outcome1 = basicskillroll(3+atkbonus); //Attackers rolls 2 dice plus attackbonus, if any. (Will input numbers for skill instead of just 2, later.)
+    cout<< "\nThe highest outcome of " << 3 + atkbonus << " dice for The Attacker is: " << outcome1 << "\n\n\n";
     
-    outcome2 = basicskillroll(2+defbonus); //Defender rolls 2 dice plus defensebonus, if any. (Will input numbers for skill instead of just 2, later.)
-    cout<< "\nThe highest outcome of " << 2 + defbonus << " dice for The Defender is: " << outcome2 << "\n\n";
+    outcome2 = basicskillroll(3+defbonus); //Defender rolls 2 dice plus defensebonus, if any. (Will input numbers for skill instead of just 2, later.)
+    cout<< "\nThe highest outcome of " << 3 + defbonus << " dice for The Defender is: " << outcome2 << "\n\n";
     
     cout<< "\nThe net result of " << outcome1 << " - " << outcome2 << " is  " << outcome1 - outcome2 << "\n";
     return outcome1 - outcome2;
