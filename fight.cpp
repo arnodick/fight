@@ -4,12 +4,12 @@
 #include <vector>
 
 using namespace std;
-int options();
-int statusincrement();
-int result();
+void options();
+void statusincrement();
+void result();
 int attackroll(int atkbonus, int defbonus);
-int statusreset();
-int endgame();
+void statusreset();
+void endgame();
 
 void player1valid();
 void player2valid();
@@ -26,10 +26,19 @@ int resultmatrix[5][5] = { 1, 1, 3, 2, 5,
                            1, 1, 2, 3, 5,
                            3, 2, 4, 4, 4,
                            2, 3, 4, 4, 4, 
-                           5, 5, 4, 4, 4 }; //This will become a 5x5 array, or larger, as more possibilities are added.
-int player1[3] = {0, 0, 0}, player2[3] = {0, 0, 0}; // The first value of the array is the move, the second value in the array is the status of the player. ie: Pain, Stunned, etc. The third is the timer for the status. ie: 1 means that status has been applied to the player for 1 full turn.
-int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2}; // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
-int knockdown1 = 0, knockdown2 =0;
+                           5, 5, 4, 4, 4 };
+//This will become a 5x5 array, or larger, as more possibilities are added.
+
+int player1[4] = {0, 0, 0, 0}, player2[4] = {0, 0, 0, 0};
+// The first value of the array is the move, the second value of the array is
+// the status of the player. ie: Pain, Stunned, etc. The third is the timer for 
+// the status. ie: 1 means that status has been applied to the player for 1 full 
+// turn. The fourth is the power of the move. (0 = jab, 1 = power punch, etc.)
+
+int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
+// First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
+
+int knockdown1 = 0, knockdown2 = 0;
                             
 vector<string> movenames(5);
 vector<string> damagenames(8);
@@ -69,7 +78,7 @@ int main()
     }
 }
 
-int options()
+void options()
 {
     // Reset choices, so that the for loop that restricts choices doesn't get confused.
     //player1[0] = 0;
@@ -86,6 +95,16 @@ int options()
         cout<< "\nPlease choose a move for Player 1:\n\n   1) Punch\n   2) Kick\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
         cin>> player1[0];
         player1valid();
+        if (player1[0] == 1)
+        {
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Hook\n\n   ";
+            cin>> player1[3];
+        }
+        if (player1[0] == 2)
+        {
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      1) Front Kick\n      2) Roundhouse\n      3) Spinning Kick\n\n   ";
+            cin>> player1[3];
+        }
     }
 
     if (player2[1] > 0)
@@ -99,10 +118,20 @@ int options()
         cout<< "\nPlease choose a move for Player 2:\n\n   1) Punch\n   2) Kick\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
         cin>> player2[0];
         player2valid();
+        if (player2[0] == 1)
+        {
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player2[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Hook\n\n   ";
+            cin>> player2[3];
+        }
+        if (player2[0] == 2)
+        {
+            cout<< "\n   Please choose a power for Player 1's " << movenames[player2[0]-1] << ":\n\n      1) Front Kick\n      2) Roundhouse\n      3) Spinning Kick\n\n   ";
+            cin>> player2[3];
+        }
     }
 }
 
-int statusincrement()
+void statusincrement()
 {
     // Now that a turn has passed, and another result hasn't been added in yet, the turn counter for status is incremented.
     if (player1[1] > 0)
@@ -111,7 +140,7 @@ int statusincrement()
        player2[2]++;
 }
 
-int result ()
+void result ()
 // Uses both players' moves and their comparison in the matrix to output a result for the turn's moves.
 {
     int result = 0, atkbonus = 0, defbonus = 0;        
@@ -136,17 +165,19 @@ int result ()
             
        else if (player1[0] == 1 || player1[0] ==  2)
        {
-          player2[1] = player2[1] + player1[0] - 1 + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
-          player2[2] = 0; //Timer reset, because a new status has been inflicted.
+            cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
+            player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
+            player2[2] = 0; //Timer reset, because a new status has been inflicted.
               
-          if (player2[1] > 7)
+            if (player2[1] > 7)
              player2[1] = 7; //Temporary. Makes any outcome greater than 7 = 7, so that game doesn't crash. Must figure out balance for numbers.
               
-          cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
        }
        else
        {
-           player1[1] = player1[1] + player2[0] - 1 + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
+           cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
+           player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
            player1[2] = 0; //Timer reset, because a new status has been inflicted.
                
            if (player1[1] > 7)
@@ -173,7 +204,8 @@ int result ()
            
        else if (player1[0] == 3 || player1[0] ==  4)
        {
-           player2[1] = player2[1] + player2[0] - 1 + result; //Player 2 was reversed, so her status becomes whatever her status was, plus the power of the move she just did (-1 for balance) plus the result number.
+           cout << "(Status = " << player2[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player2[1] + player2[3] + result << ")";
+           player2[1] = player2[1] + player2[3] /*- 1*/ + result; //Player 2 was reversed, so her status becomes whatever her status was, plus the power of the move she just did (-1 for balance) plus the result number.
            player2[2] = 0; //Timer reset, because a new status has been inflicted.
            
            if (player2[1] > 7)
@@ -183,7 +215,8 @@ int result ()
        }
        else
        {
-           player1[1] = player1[1] + player1[0] - 1 + result; //Player 1 was reversed, so his status becomes whatever his status was, plus the power of the move he just did (-1 for balance) plus the result number.
+           cout << "(Status = " << player1[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player1[1] + player1[3] + result << ")";
+           player1[1] = player1[1] + player1[3] /*- 1*/ + result; //Player 1 was reversed, so his status becomes whatever his status was, plus the power of the move he just did (-1 for balance) plus the result number.
            player1[2] = 0; //Timer reset, because a new status has been inflicted.
            
            if (player1[1] > 7)
@@ -213,7 +246,8 @@ int result ()
             
        else if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[1] = player2[1] + player1[0] - 1 + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
+            cout << "(Status = " << player2[1] << " + Attack Pwr = " << player1[3] << " + Result = " << result << " = " << player2[1] + player1[3] + result << ")";
+            player2[1] = player2[1] + player1[3] /*- 1*/ + result; //Player 2 was hit, so her status becomes the power of the strike she was hit with (-1 for balance) plus whatever her current damage status is, plus the net result of the dice. (Eventually use resilience to lower this as well.)
             player2[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player2[1] > 7)
@@ -223,7 +257,8 @@ int result ()
        }
        else
        {
-            player1[1] = player1[1] + player2[0] - 1 + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
+            cout << "(Status = " << player1[1] << " + Attack Pwr = " << player2[3] << " + Result = " << result << " = " << player1[1] + player2[3] + result << ")";
+            player1[1] = player1[1] + player2[3] /*- 1*/ + result; //Player 1 was hit, so his status becomes the power of the strike he was hit with (-1 for balance) plus whatever his current damage status is.
             player1[2] = 0; //Timer reset, because a new status has been inflicted.
             
             if (player1[1] > 7)
@@ -248,7 +283,7 @@ int attackroll(int atkbonus, int defbonus)
     return outcome1 - outcome2;
 }
 
-int statusreset()
+void statusreset()
 {
     if (player1[1] == 5 || player1[1] == 6)
     {
@@ -300,7 +335,7 @@ int statusreset()
     // Maybe do this so player goes from STUNNED to DISTRACTED after one turn?
 }
 
-int endgame()
+void endgame()
 {
     if (knockdown1 == 3)
        cout << "\nPlayer 1 was knocked down " << knockdown1 << " times! Player 2 WINS!\n";
