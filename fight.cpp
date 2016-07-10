@@ -31,15 +31,23 @@ int resultmatrix[5][5] = { 1, 1, 3, 2, 5,
                            5, 5, 4, 4, 4 };
 //This will become a 5x5 array, or larger, as more possibilities are added.
 
-int player1[6] = {0, 0, 0, 0, 0, 0}, player2[6] = {0, 0, 0, 0, 0, 0};
-// The first value of the array is the move, the second value of the array is
-// the concussion status of the player. ie: Stunned, knocked out, etc. The third is the timer for 
-// the concussion status. ie: 1 means that status has been applied to the player for 1 full 
-// turn. The fourth is the power of the move. (0 = jab, 1 = power punch, etc.)
-// Fifth is the pain status of the player. ie: distracted, confused, etc. 
-// Sixth is the timer for the pain status.
+int player1[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, player2[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+// First value is the move.
+// Second value is the power of the move. (0 = jab, 1 = power punch, etc.)
+// Third value is the concussion status of the player.
+//   ie: Stunned, knocked out, etc
+// Fourth value is the timer for the concussion status.
+//   ie: 1 means that status has been applied to the player for 1 full turn.
+// Fifth value is the pain status of the player. 
+//   ie: distracted, confused, etc. 
+// Sixth value is the timer for the pain status.
+// Seventh value is the conditioning status of the player. 
+//   ie: -1, -2, to all stats, etc. 
+// Eighth value is the timer for the conditioning status.
+// Ninth value is the location of the attack.
+//   ie: 1 = Head, 2 = Body, 3 = Legs
 
-int statsplayer1[5] = {3, 3, 3, 3, 3}, statsplayer2[5] = {3, 3, 3, 3, 3};
+int statsplayer1[5] = {2, 2, 2, 2, 2}, statsplayer2[5] = {2, 2, 2, 2, 2};
 // First = STR, second = SPD, third = RES, fourth = WILL, fifth = COND.
 
 int knockdown1 = 0, knockdown2 = 0, timercheck = 0;
@@ -59,9 +67,9 @@ int main()
     {
      
         //Reset all statuses and counts for a new game.   
-        knockdown1 = 0; knockdown2 = 0; player2[1] = 0; player2[2] = 0;  player1[1] = 0;  player1[2] = 0;
+        knockdown1 = 0; knockdown2 = 0; player2[2] = 0; player2[3] = 0;  player1[2] = 0;  player1[3] = 0;
         
-        for ( ; knockdown1 < 3 && knockdown2 < 3 && player1[1] < 7 && player2[1] < 7; )
+        for ( ; knockdown1 < 3 && knockdown2 < 3 && player1[2] < 7 && player2[2] < 7; )
         {
     
             options();
@@ -85,9 +93,9 @@ int main()
 void options()
 {
     
-    if (player1[1] > 0)
+    if (player1[2] > 0)
     {
-        cout<< "\nPlayer 1 is " << damagenames[player1[1]] << " and may only:\n\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
+        cout<< "\nPlayer 1 is " << damagenames[player1[2]] << " and may only:\n\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
         cin>> player1[0];
         player1valid();
     }
@@ -99,18 +107,22 @@ void options()
         if (player1[0] == 1)
         {
             cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
-            cin>> player1[3];
+            cin>> player1[1];
+            cout<< "\n     Please choose a location for Player 1's " << movenames[player1[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
+            cin>> player1[8];
         }
         if (player1[0] == 2)
         {
             cout<< "\n   Please choose a power for Player 1's " << movenames[player1[0]-1] << ":\n\n      1) Kick\n\n      3) Roundhouse\n\n      5) Spinning Kick\n\n   ";
-            cin>> player1[3];
+            cin>> player1[1];
+            cout<< "\n     Please choose a location for Player 1's " << movenames[player1[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
+            cin>> player1[8];
         }
     }
 
-    if (player2[1] > 0)
+    if (player2[2] > 0)
     {
-        cout<< "\nPlayer 2 is " << damagenames[player2[1]] << " and may only:\n\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
+        cout<< "\nPlayer 2 is " << damagenames[player2[2]] << " and may only:\n\n   3) Parry\n   4) Dodge\n   5) Block\n\n   ";
         cin>> player2[0];
         player2valid();
     }
@@ -122,12 +134,16 @@ void options()
         if (player2[0] == 1)
         {
             cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      0) Jab\n      1) Straight\n      2) Uppercut\n      3) Hook\n      4) Haymaker\n\n   ";
-            cin>> player2[3];
+            cin>> player2[1];
+            cout<< "\n     Please choose a location for Player 2's " << movenames[player2[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
+            cin>> player2[8];
         }
         if (player2[0] == 2)
         {
             cout<< "\n   Please choose a power for Player 2's " << movenames[player2[0]-1] << ":\n\n      1) Front Kick\n\n      3) Roundhouse\n\n      5) Spinning Kick\n\n   ";
-            cin>> player2[3];
+            cin>> player2[1];
+            cout<< "\n     Please choose a location for Player 2's " << movenames[player2[0]-1] << ":\n\n        1) Head\n        2) Body\n        3) Legs\n\n   ";
+            cin>> player2[8];
         }
     }
 }
@@ -135,10 +151,10 @@ void options()
 void statusincrement()
 {
     // Now that a turn has passed, and another result hasn't been added in yet, the turn counter for status is incremented.
-    if (player1[1] > 0)
-       player1[2]++;
-    if (player2[1] > 0)
-       player2[2]++;
+    if (player1[2] > 0)
+       player1[3]++;
+    if (player2[2] > 0)
+       player2[3]++;
 }
 
 void result ()
@@ -151,55 +167,55 @@ void result ()
        atkbonus = 0;
        defbonus = -2; // The person being hit has a -3 to defense, because they are attacking.
        // Compares speed of each player's attack, by checking the speed stat minus the power of the attack. The more powerful an attack, the slower.
-       if (statsplayer1[1] - player1[3] > statsplayer2[1] - player2[3])
+       if (statsplayer1[2] - player1[1] > statsplayer2[2] - player2[1])
        {
             cout << "Player 1 was faster than player 2!";
-            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
             if (timercheck == 1)
-                player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                player2[3] = 0; //Timer reset, because a new status has been inflicted.
             
             namefix();
              
-            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << "!\n";
             
-            if (player2[1] < 1)
+            if (player2[2] < 1)
             {
                 cout << "\nPlayer 2 fought through the pain!\n";
-                player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
+                player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
                 if (timercheck == 1)
-                    player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                    player1[3] = 0; //Timer reset, because a new status has been inflicted.
                 
                 namefix();
              
-                cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
+                cout<< "\nPlayer 1 is " << damagenames[player1[2]] << "!\n";
             }
             
        }
-       else if (statsplayer1[1] - player1[3] == statsplayer2[1] - player2[3])
+       else if (statsplayer1[2] - player1[1] == statsplayer2[2] - player2[1])
        {
-            cout << "/nBoth players were the same speed, and cancelled each other out!"; 
+            cout << "\nBoth players were the same speed, and cancelled each other out!"; 
        }
        else
        {
             cout << "Player 2 was faster than player 1!";
-            player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
+            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
             if (timercheck == 1)
-                player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                player1[3] = 0; //Timer reset, because a new status has been inflicted.
             
             namefix();
             
-            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
+            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << "!\n";
             
-            if (player1[1] < 1)
+            if (player1[2] < 1)
             {
                 cout << "\nPlayer 1 fought through the pain!\n";
-                player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
+                player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
                 if (timercheck == 1)
-                    player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                    player2[3] = 0; //Timer reset, because a new status has been inflicted.
                 
                 namefix();
              
-                cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+                cout<< "\nPlayer 2 is " << damagenames[player2[2]] << "!\n";
             }
        }
     }
@@ -216,23 +232,23 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
             if (timercheck == 1)
-                player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                player2[3] = 0; //Timer reset, because a new status has been inflicted.
               
             namefix();
               
-            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << "!\n";
        }
        else
        {
-           player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
+           player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
            if (timercheck == 1)
-                player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                player1[3] = 0; //Timer reset, because a new status has been inflicted.
                
            namefix();
                
-           cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
+           cout<< "\nPlayer 1 is " << damagenames[player1[2]] << "!\n";
        }
     }
        
@@ -248,23 +264,23 @@ void result ()
            
        if (player1[0] == 3 || player1[0] ==  4)
        {
-           player2[1] = damagecalc (player2[1], player2[3], 0, 0, atkbonus, defbonus);
+           player2[2] = damagecalc (player2[2], player2[1], 0, 0, atkbonus, defbonus);
            if (timercheck == 1)
-                player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                player2[3] = 0; //Timer reset, because a new status has been inflicted.
            
            namefix();
            
-           cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+           cout<< "\nPlayer 2 is " << damagenames[player2[2]] << "!\n";
        }
        else
        {
-           player1[1] = damagecalc (player1[1], player1[3], 0, 0, atkbonus, defbonus);
+           player1[2] = damagecalc (player1[2], player1[1], 0, 0, atkbonus, defbonus);
            if (timercheck == 1)
-                player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                player1[3] = 0; //Timer reset, because a new status has been inflicted.
            
            namefix();
            
-           cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
+           cout<< "\nPlayer 1 is " << damagenames[player1[2]] << "!\n";
        }
     }
        
@@ -283,22 +299,22 @@ void result ()
             
        if (player1[0] == 1 || player1[0] ==  2)
        {
-            player2[1] = damagecalc (player2[1], player1[3], statsplayer1[0], statsplayer2[2], atkbonus, defbonus);
+            player2[2] = damagecalc (player2[2], player1[1], statsplayer1[0], statsplayer2[3], atkbonus, defbonus);
             if (timercheck == 1)
-                player2[2] = 0; //Timer reset, because a new status has been inflicted.
+                player2[3] = 0; //Timer reset, because a new status has been inflicted.
             
             namefix();
-            cout<< "\nPlayer 2 is " << damagenames[player2[1]] << "!\n";
+            cout<< "\nPlayer 2 is " << damagenames[player2[2]] << "!\n";
        }
        else
        {
-            player1[1] = damagecalc (player1[1], player2[3], statsplayer2[0], statsplayer1[2], atkbonus, defbonus);
+            player1[2] = damagecalc (player1[2], player2[1], statsplayer2[0], statsplayer1[3], atkbonus, defbonus);
             if (timercheck == 1)
-                player1[2] = 0; //Timer reset, because a new status has been inflicted.
+                player1[3] = 0; //Timer reset, because a new status has been inflicted.
             
             namefix();
             
-            cout<< "\nPlayer 1 is " << damagenames[player1[1]] << "!\n";
+            cout<< "\nPlayer 1 is " << damagenames[player1[2]] << "!\n";
        }
    }
 }
@@ -354,51 +370,51 @@ int damagecalc (int status, int power, int str, int res, int atkbonus, int defbo
 
 void statusreset()
 {
-    if (player1[1] == 5 || player1[1] == 6)
+    if (player1[2] == 5 || player1[2] == 6)
     {
-       player1[1] = 0; //Status reset.
-       player1[2] = 0; //Timer reset.
-       player2[1] = 0; //Status reset.
-       player2[2] = 0; //Timer reset.
+       player1[2] = 0; //Status reset.
+       player1[3] = 0; //Timer reset.
+       player2[2] = 0; //Status reset.
+       player2[3] = 0; //Timer reset.
        knockdown1++;
        cout<< "\nPlayer 1 has been KNOCKED DOWN " << knockdown1 << " times!\n";
     }
-    if (player2[1] == 5 || player2[1] == 6)
+    if (player2[2] == 5 || player2[2] == 6)
     {
-       player2[1] = 0; //Status reset.
-       player2[2] = 0; //Timer reset.
-       player1[1] = 0; //Status reset.
-       player1[2] = 0; //Timer reset.
+       player2[2] = 0; //Status reset.
+       player2[3] = 0; //Timer reset.
+       player1[2] = 0; //Status reset.
+       player1[3] = 0; //Timer reset.
        knockdown2++;
        cout<< "\nPlayer 2 has been KNOCKED DOWN " << knockdown2 << " times!\n";
     }
        
     // If a player's STUNNED status is unchanged after two turns of results, then that status goes away. ie: The player didn't get hurt while STUNNED two turns, so they shook it off.
-    if ( (player1[1] == 3 || player1[1] == 4) && player1[2] > 1)
+    if ( (player1[2] == 3 || player1[2] == 4) && player1[3] > 1)
     {
-       player1[1] = 0; //Status reset.
-       player1[2] = 0; //Timer reset.
-       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[1]] << "\n";
+       player1[2] = 0; //Status reset.
+       player1[3] = 0; //Timer reset.
+       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[2]] << "\n";
     }
-    if ( (player2[1] == 3 || player2[1] == 4) && player2[2] > 1)
+    if ( (player2[2] == 3 || player2[2] == 4) && player2[3] > 1)
     {
-       player2[1] = 0; //Status reset.
-       player2[2] = 0; //Timer reset.
-       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[1]] << "\n";
+       player2[2] = 0; //Status reset.
+       player2[3] = 0; //Timer reset.
+       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[2]] << "\n";
     }
     
     // If a player's DISTRACTED status is unchanged after one turn of results, then that status goes away. ie: The player didn't get hurt while DISTRACTED for one turn, so they shook it off.
-    if ( (player1[1] == 1 || player1[1] == 2) && player1[2] > 0)
+    if ( (player1[2] == 1 || player1[2] == 2) && player1[3] > 0)
     {
-       player1[1] = 0; //Status reset.
-       player1[2] = 0; //Timer reset.
-       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[1]] << "\n";
+       player1[2] = 0; //Status reset.
+       player1[3] = 0; //Timer reset.
+       cout<< "\nPlayer 1 recovered and is " << damagenames[player1[2]] << "\n";
     }
-    if ( (player2[1] == 1 || player2[1] == 2) && player2[2] > 0)
+    if ( (player2[2] == 1 || player2[2] == 2) && player2[3] > 0)
     {
-       player2[1] = 0; //Status reset.
-       player2[2] = 0; //Timer reset.
-       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[1]] << "\n";
+       player2[2] = 0; //Status reset.
+       player2[3] = 0; //Timer reset.
+       cout<< "\nPlayer 2 recovered and is " << damagenames[player2[2]] << "\n";
     }
     
     // Maybe do this so player goes from STUNNED to DISTRACTED after one turn?
@@ -412,16 +428,16 @@ void endgame()
     if (knockdown2 == 3)
        cout << "\nPlayer 2 was knocked down " << knockdown2 << " times! Player 1 WINS!\n";
        
-    if (player1[1] > 6)
+    if (player1[2] > 6)
        cout << "\nPlayer 1 was knocked out! Player 2 WINS!\n";
        
-    if (player2[1] > 6)
+    if (player2[2] > 6)
        cout << "\nPlayer 2 was knocked out! Player 1 WINS!\n";
 }
 
 void player1valid()
 {
-    if (player1[1] > 0)
+    if (player1[2] > 0)
     {
         for ( ; (player1[0] < 3 || player1[0] > 5); )
         {
@@ -441,7 +457,7 @@ void player1valid()
 
 void player2valid()
 {
-     if (player2[1] > 0)
+     if (player2[2] > 0)
     {
         for ( ; (player2[0] < 3 || player2[0] > 5); )
         {
@@ -555,13 +571,13 @@ void damagenameset()
 void namefix()
 //Makes any outcome greater than 7 = 7, or lower than 0 = 0, so that game doesn't crash.
 {
-    if (player1[1] < 0)
-        player1[1] = 0;
-    if (player1[1] > 7)
-        player1[1] = 7;
-    if (player2[1] < 0)
-        player2[1] = 0;
-    if (player2[1] > 7)
-        player2[1] = 7;
+    if (player1[2] < 0)
+        player1[2] = 0;
+    if (player1[2] > 7)
+        player1[2] = 7;
+    if (player2[2] < 0)
+        player2[2] = 0;
+    if (player2[2] > 7)
+        player2[2] = 7;
 }
 
