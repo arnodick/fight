@@ -4,7 +4,8 @@
 #include <vector>
 #include <fstream>
 #include <string>
-
+//TODO turn off debug mode
+//TODO use link to link the dll here so it is linked https://stackoverflow.com/questions/20890458/compile-c-in-vs-without-requiring-msvcp120d-dll-at-runtime
 
 using namespace std;
 void report();
